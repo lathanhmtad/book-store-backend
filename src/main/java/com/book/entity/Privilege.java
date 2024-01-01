@@ -14,6 +14,7 @@ import java.util.Collection;
 @Entity
 public class Privilege extends BaseEntity{
     private String name;
+    private String description;
 
     @ManyToMany(mappedBy = "privileges")
     private Collection<Role> roles;

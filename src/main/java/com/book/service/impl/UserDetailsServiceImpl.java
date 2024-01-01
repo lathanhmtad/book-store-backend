@@ -3,6 +3,7 @@ package com.book.service.impl;
 import com.book.entity.Privilege;
 import com.book.entity.Role;
 import com.book.entity.User;
+import com.book.exception.EmailNotFoundException;
 import com.book.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,9 +24,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     UserRepo userRepo;
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepo.findByEmail(username)
+                .orElseThrow(() -> new EmailNotFoundException("User", "Email", username));
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
                 user.getPassword(), user.getEnabled(), true, true, true,
                 getAuthorities(user.getRoles()));

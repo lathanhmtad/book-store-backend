@@ -14,3 +14,10 @@ spring:
     url: jdbc:mysql://localhost:3306/book_store
     username: root
     password: 1234
+
+# app properties
+com:
+  book:
+    jwtCookieName: jwt
+    jwtSecret: ======================jwt=spring===========================
+    jwtExpirationMs: 86400000 # 1 hour

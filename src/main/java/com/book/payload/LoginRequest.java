@@ -1,4 +1,4 @@
-package com.book.dto.request;
+package com.book.payload;
 
 import lombok.Getter;
 import lombok.Setter;

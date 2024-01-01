@@ -1,8 +1,7 @@
 package com.book.service;
 
-import com.book.dto.request.LoginRequest;
-import com.book.dto.response.LoginResponse;
+import com.book.payload.LoginResponse;
 
 public interface AuthService {
-    LoginResponse authenticate(LoginRequest loginRequest);
+    LoginResponse authenticate(String email, String password);
 }
