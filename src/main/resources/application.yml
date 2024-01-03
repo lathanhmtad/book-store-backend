@@ -18,6 +18,5 @@ spring:
 # app properties
 com:
   book:
-    jwtCookieName: jwt
     jwtSecret: ======================jwt=spring===========================
-    jwtExpirationMs: 86400000 # 1 hour
+    jwtExpirationMs: 3600000

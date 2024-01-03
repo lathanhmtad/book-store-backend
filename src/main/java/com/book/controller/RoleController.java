@@ -1,11 +1,43 @@
 package com.book.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.book.payload.RoleDto;
+import com.book.payload.RoleRequest;
+import com.book.payload.RoleResponse;
+import com.book.service.RoleService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/roles")
 public class RoleController {
+    private RoleService roleService;
+    @GetMapping
+    public ResponseEntity<RoleResponse> getRoles(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "limit", required = false) Integer limit
+    ) {
+        RoleResponse result = roleService.listAll(page, limit);
+        return ResponseEntity.ok(result);
+    }
+    @PostMapping
+    public ResponseEntity<Map> createRoles(@RequestBody RoleRequest roleRequest) {
+        roleService.createRoles(roleRequest.getRoles());
+        return ResponseEntity.ok(Map.of("message", "create new success roles"));
+    }
 
+    @PutMapping("/{id}")
+    ResponseEntity<Map> updateRole(@PathVariable Long id, @RequestBody RoleDto data) {
+        roleService.update(id, data);
+        return ResponseEntity.ok(Map.of("message", "update role success"));
+    }
+    @DeleteMapping
+    ResponseEntity<Map> deleteRoles(@RequestBody List<Long> ids) {
+        roleService.delete(ids);
+        return ResponseEntity.ok(Map.of("message", "delete role success"));
+    }
 }

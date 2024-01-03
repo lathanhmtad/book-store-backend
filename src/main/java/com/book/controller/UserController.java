@@ -14,8 +14,9 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping
-    public ResponseEntity<UserDto> createNewUser(@ModelAttribute UserRequest userRequest) {
-        UserDto response = userService.createNewUser(userRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> createNewUser() {
+//        UserDto response = userService.createNewUser(userRequest);
+//        return ResponseEntity.ok(response);
+        return ResponseEntity.ok("Hi");
     }
 }

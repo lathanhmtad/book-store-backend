@@ -3,9 +3,9 @@ package com.book.service.impl;
 import com.book.entity.Privilege;
 import com.book.entity.Role;
 import com.book.entity.User;
-import com.book.exception.EmailNotFoundException;
+import com.book.exception.ResourceNotFoundException;
 import com.book.repository.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,15 +18,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@AllArgsConstructor
 @Service
 @Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
-    @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByEmail(username)
-                .orElseThrow(() -> new EmailNotFoundException("User", "Email", username));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Email", username));
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
                 user.getPassword(), user.getEnabled(), true, true, true,
                 getAuthorities(user.getRoles()));
