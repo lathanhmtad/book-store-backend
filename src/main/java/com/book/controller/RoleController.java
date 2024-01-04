@@ -18,8 +18,8 @@ public class RoleController {
     private RoleService roleService;
     @GetMapping
     public ResponseEntity<RoleResponse> getRoles(
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "limit", required = false) Integer limit
+            @RequestParam(value = "page", defaultValue = "4", required = false) Integer page,
+            @RequestParam(value = "limit", defaultValue = "4", required = false) Integer limit
     ) {
         RoleResponse result = roleService.listAll(page, limit);
         return ResponseEntity.ok(result);

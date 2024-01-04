@@ -6,19 +6,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Optional;
-@AllArgsConstructor
 @Configuration
-@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+@AllArgsConstructor
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class AuditConfig {
     private UserRepo userRepo;
     @Bean
-    AuditorAware<Long> auditorProvider() {
-        return () -> {
-            Long currentUserId = userRepo.findIdByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-            return Optional.ofNullable(currentUserId);
-        };
+    public AuditorAware<Long> auditorAware() {
+        return new AuditorAwareImpl(userRepo);
     }
 }

@@ -11,7 +11,7 @@ spring:
         format_sql: true
     open-in-view: true
   datasource:
-    url: jdbc:mysql://localhost:3306/book_store
+    url: jdbc:mysql://localhost:3306/book_store?createDatabaseIfNotExist=true
     username: root
     password: 1234
 

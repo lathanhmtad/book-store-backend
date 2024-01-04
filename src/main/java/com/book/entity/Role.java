@@ -13,8 +13,10 @@ import java.util.Collection;
 @ToString
 @Entity
 public class Role extends BaseEntity {
+
     @Column(unique = true)
     private String name;
+
     private String description;
 
     @ManyToMany(mappedBy = "roles")
