@@ -5,4 +5,5 @@ import com.book.payload.UserRequest;
 
 public interface UserService {
     UserDto createNewUser(UserRequest userRequest);
+
 }

@@ -25,19 +25,25 @@ public class RoleController {
         return ResponseEntity.ok(result);
     }
     @PostMapping
-    public ResponseEntity<Map> createRoles(@RequestBody RoleRequest roleRequest) {
+    public ResponseEntity<Map<String, String>> createRoles(@RequestBody RoleRequest roleRequest) {
         roleService.createRoles(roleRequest.getRoles());
         return ResponseEntity.ok(Map.of("message", "create new success roles"));
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Map> updateRole(@PathVariable Long id, @RequestBody RoleDto data) {
+    ResponseEntity<Map<String, String>> updateRole(@PathVariable Long id, @RequestBody RoleDto data) {
         roleService.update(id, data);
         return ResponseEntity.ok(Map.of("message", "update role success"));
     }
     @DeleteMapping
-    ResponseEntity<Map> deleteRoles(@RequestBody List<Long> ids) {
+    ResponseEntity<Map<String, String>> deleteRoles(@RequestBody List<Long> ids) {
         roleService.delete(ids);
+        return ResponseEntity.ok(Map.of("message", "delete roles success"));
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Map<String, String>> deleteRole(@PathVariable Long id) {
+        roleService.delete(id);
         return ResponseEntity.ok(Map.of("message", "delete role success"));
     }
 }

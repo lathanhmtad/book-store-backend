@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,7 +59,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional
     public void update(Long id, RoleDto roleDto) {
         try {
             Role existedRole = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role", "id", String.valueOf(id)));
@@ -75,6 +73,16 @@ public class RoleServiceImpl implements RoleService {
     public void delete(List<Long> ids) {
         try {
             roleRepo.deleteAllById(ids);
+        } catch (Exception e) {
+            throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        try {
+            Role existedRole = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role", "id", String.valueOf(id)));
+            roleRepo.deleteById(existedRole.getId());
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

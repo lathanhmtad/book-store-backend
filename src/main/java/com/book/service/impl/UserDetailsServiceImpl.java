@@ -5,6 +5,7 @@ import com.book.entity.Role;
 import com.book.entity.User;
 import com.book.exception.ResourceNotFoundException;
 import com.book.repository.UserRepo;
+import com.book.security.MyUserDetails;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,9 +28,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByEmail(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Email", username));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),
-                user.getPassword(), user.getEnabled(), true, true, true,
-                getAuthorities(user.getRoles()));
+        return new MyUserDetails(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getPassword(),
+                    user.getEnabled(),
+                    true,
+                    true,
+                    true,
+                    getAuthorities(user.getRoles())
+                );
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
