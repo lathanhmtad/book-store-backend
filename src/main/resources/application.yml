@@ -18,5 +18,8 @@ spring:
 # app properties
 com:
   book:
-    jwtSecret: ======================jwt=spring===========================
-    jwtExpirationMs: 3600000
+    cloudinary:
+      imageFolder: book-store-images
+    jwt:
+      jwtSecret: ======================jwt=spring===========================
+      jwtExpirationMs: 3600000

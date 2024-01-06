@@ -1,4 +1,4 @@
-package com.book.payload;
+package com.book.payload.user;
 
 public class UserResponse {
 }

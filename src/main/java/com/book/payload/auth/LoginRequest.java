@@ -1,4 +1,4 @@
-package com.book.payload;
+package com.book.payload.auth;
 
 import lombok.Getter;
 import lombok.Setter;

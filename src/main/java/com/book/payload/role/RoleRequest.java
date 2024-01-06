@@ -1,4 +1,4 @@
-package com.book.payload;
+package com.book.payload.role;
 
 import lombok.Getter;
 import lombok.Setter;

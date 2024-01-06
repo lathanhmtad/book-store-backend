@@ -1,8 +1,8 @@
 package com.book.controller;
 
-import com.book.payload.RoleDto;
-import com.book.payload.RoleRequest;
-import com.book.payload.RoleResponse;
+import com.book.payload.role.RoleDto;
+import com.book.payload.role.RoleRequest;
+import com.book.payload.role.RoleResponse;
 import com.book.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,12 @@ import java.util.Map;
 @RequestMapping("/api/v1/roles")
 public class RoleController {
     private RoleService roleService;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<RoleDto>> getRoles() {
+        List<RoleDto> roles = roleService.listAll();
+        return ResponseEntity.ok(roles);
+    }
     @GetMapping
     public ResponseEntity<RoleResponse> getRoles(
             @RequestParam(value = "page", defaultValue = "4", required = false) Integer page,
@@ -25,15 +31,15 @@ public class RoleController {
         return ResponseEntity.ok(result);
     }
     @PostMapping
-    public ResponseEntity<Map<String, String>> createRoles(@RequestBody RoleRequest roleRequest) {
-        roleService.createRoles(roleRequest.getRoles());
-        return ResponseEntity.ok(Map.of("message", "create new success roles"));
+    public ResponseEntity<List<RoleDto>> createRoles(@RequestBody RoleRequest roleRequest) {
+        List<RoleDto> savedRoles = roleService.createRoles(roleRequest.getRoles());
+        return ResponseEntity.ok(savedRoles);
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Map<String, String>> updateRole(@PathVariable Long id, @RequestBody RoleDto data) {
-        roleService.update(id, data);
-        return ResponseEntity.ok(Map.of("message", "update role success"));
+    ResponseEntity<RoleDto> updateRole(@PathVariable Long id, @RequestBody RoleDto data) {
+        RoleDto updatedRole = roleService.update(id, data);
+        return ResponseEntity.ok(updatedRole);
     }
     @DeleteMapping
     ResponseEntity<Map<String, String>> deleteRoles(@RequestBody List<Long> ids) {

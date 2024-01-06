@@ -14,10 +14,10 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-    @Value("${com.book.jwtSecret}")
+    @Value("${com.book.jwt.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${com.book.jwtExpirationMs}")
+    @Value("${com.book.jwt.jwtExpirationMs}")
     private int jwtExpirationMs;
 
     public boolean validateJwtToken(String authToken) {

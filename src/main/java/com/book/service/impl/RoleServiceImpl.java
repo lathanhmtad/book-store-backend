@@ -3,8 +3,8 @@ package com.book.service.impl;
 import com.book.entity.Role;
 import com.book.exception.BookStoreApiException;
 import com.book.exception.ResourceNotFoundException;
-import com.book.payload.RoleDto;
-import com.book.payload.RoleResponse;
+import com.book.payload.role.RoleDto;
+import com.book.payload.role.RoleResponse;
 import com.book.repository.RoleRepo;
 import com.book.service.RoleService;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,16 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl implements RoleService {
     private ModelMapper modelMapper;
     private RoleRepo roleRepo;
+
+    @Override
+    public List<RoleDto> listAll() {
+        try {
+            List<Role> roles = roleRepo.findAll();
+            return roles.stream().map(item -> modelMapper.map(item, RoleDto.class)).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @Override
     public RoleResponse listAll(Integer pageNumber, Integer limit) {
@@ -49,21 +59,24 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void createRoles(List<RoleDto> roles) {
+    public List<RoleDto> createRoles(List<RoleDto> roles) {
         try {
             List<Role> entities = roles.stream().map(role -> modelMapper.map(role, Role.class)).collect(Collectors.toList());
-            roleRepo.saveAll(entities);
+            List<Role> savedRoles = roleRepo.saveAll(entities);
+            return savedRoles.stream().map(entity -> modelMapper.map(entity, RoleDto.class)).collect(Collectors.toList());
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
-    public void update(Long id, RoleDto roleDto) {
+    public RoleDto update(Long id, RoleDto roleDto) {
         try {
             Role existedRole = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role", "id", String.valueOf(id)));
+            roleDto.setId(existedRole.getId());
             modelMapper.map(roleDto, existedRole);
-            roleRepo.save(existedRole);
+            Role savedRole = roleRepo.save(existedRole);
+            return modelMapper.map(savedRole, RoleDto.class);
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -72,7 +85,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void delete(List<Long> ids) {
         try {
-            roleRepo.deleteAllById(ids);
+            ids.forEach(id -> {
+                roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Role", "id", String.valueOf(id)));
+                roleRepo.deleteById(id);
+            });
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

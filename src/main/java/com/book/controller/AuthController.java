@@ -1,7 +1,7 @@
 package com.book.controller;
 
-import com.book.payload.LoginRequest;
-import com.book.payload.LoginResponse;
+import com.book.payload.auth.LoginRequest;
+import com.book.payload.auth.LoginResponse;
 import com.book.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

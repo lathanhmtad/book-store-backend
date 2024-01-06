@@ -1,7 +1,7 @@
 package com.book.service;
 
-import com.book.payload.UserDto;
-import com.book.payload.UserRequest;
+import com.book.payload.user.UserDto;
+import com.book.payload.user.UserRequest;
 
 public interface UserService {
     UserDto createNewUser(UserRequest userRequest);

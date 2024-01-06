@@ -1,7 +1,7 @@
 package com.book.service.impl;
 
 import com.book.exception.BookStoreApiException;
-import com.book.payload.LoginResponse;
+import com.book.payload.auth.LoginResponse;
 import com.book.service.AuthService;
 import com.book.security.JwtTokenProvider;
 import lombok.AllArgsConstructor;
