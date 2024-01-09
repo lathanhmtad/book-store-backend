@@ -19,7 +19,7 @@ spring:
 com:
   book:
     cloudinary:
-      imageFolder: book-store-images
+      rootFolder: book-store-images
     jwt:
       jwtSecret: ======================jwt=spring===========================
       jwtExpirationMs: 3600000

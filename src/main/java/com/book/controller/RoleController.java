@@ -1,5 +1,6 @@
 package com.book.controller;
 
+import com.book.constant.AppConstant;
 import com.book.payload.role.RoleDto;
 import com.book.payload.role.RoleRequest;
 import com.book.payload.role.RoleResponse;
@@ -24,8 +25,8 @@ public class RoleController {
     }
     @GetMapping
     public ResponseEntity<RoleResponse> getRoles(
-            @RequestParam(value = "page", defaultValue = "4", required = false) Integer page,
-            @RequestParam(value = "limit", defaultValue = "4", required = false) Integer limit
+            @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER, required = false) Integer page,
+            @RequestParam(value = "limit", defaultValue = AppConstant.ROLES_DEFAULT_PAGE_SIZE, required = false) Integer limit
     ) {
         RoleResponse result = roleService.listAll(page, limit);
         return ResponseEntity.ok(result);

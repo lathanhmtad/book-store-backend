@@ -1,9 +1,6 @@
 package com.book.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Collection;
@@ -16,6 +13,7 @@ import java.util.Collection;
 @Entity
 public class User extends BaseEntity {
     private String fullName;
+    @Column(unique = true)
     private String email;
     private String password;
     private String phoneNumber;

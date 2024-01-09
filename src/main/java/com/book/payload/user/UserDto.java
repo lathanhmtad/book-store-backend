@@ -1,6 +1,10 @@
 package com.book.payload.user;
 
+import com.book.payload.role.RoleDto;
 import lombok.*;
+
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -13,4 +17,5 @@ public class UserDto {
     private String phoneNumber;
     private String photo;
     private Boolean enabled;
+    private List<RoleDto> roles;
 }
