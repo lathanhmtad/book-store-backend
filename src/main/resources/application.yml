@@ -17,9 +17,13 @@ spring:
 
 # app properties
 com:
-  book:
+  app:
     cloudinary:
+      name: dixswfj8d
+      apiKey: 876943471796471
+      apiSecret: XXlwrvw541Qmp83wIgDjxZpIoNQ
       rootFolder: book-store-images
     jwt:
       jwtSecret: ======================jwt=spring===========================
-      jwtExpirationMs: 3600000
+      jwtExpirationMs: 15000
+      jwtRefreshExpirationMs: 15000
