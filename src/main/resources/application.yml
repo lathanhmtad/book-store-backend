@@ -3,7 +3,7 @@ server:
 
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:
@@ -25,5 +25,5 @@ com:
       rootFolder: book-store-images
     jwt:
       jwtSecret: ======================jwt=spring===========================
-      jwtExpirationMs: 15000
-      jwtRefreshExpirationMs: 15000
+      jwtExpiration: 2 minutes
+      jwtRefreshExpiration: 30 minutes

@@ -7,9 +7,9 @@ import java.time.Instant;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 public class RefreshToken extends BaseEntity {
     @OneToOne
@@ -21,4 +21,5 @@ public class RefreshToken extends BaseEntity {
 
     @Column(nullable = false)
     private Instant expiryDate;
+
 }

@@ -1,9 +1,9 @@
 package com.app.controller;
 
 import com.app.constant.AppConstant;
+import com.app.payload.PaginationResponse;
 import com.app.payload.role.RoleDto;
 import com.app.payload.role.RoleRequest;
-import com.app.payload.role.RoleResponse;
 import com.app.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +24,22 @@ public class RoleController {
         return ResponseEntity.ok(roles);
     }
     @GetMapping
-    public ResponseEntity<RoleResponse> getRoles(
+    public ResponseEntity<PaginationResponse<RoleDto>> getRoles(
             @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER, required = false) Integer page,
             @RequestParam(value = "limit", defaultValue = AppConstant.ROLES_DEFAULT_PAGE_SIZE, required = false) Integer limit
     ) {
-        RoleResponse result = roleService.listAll(page, limit);
+        PaginationResponse<RoleDto> result = roleService.listAll(page, limit);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RoleDto> getRole(
+            @PathVariable("id") Long roleId
+    ) {
+        RoleDto res = roleService.getRoleById(roleId);
+        return ResponseEntity.ok(res);
+    }
+
     @PostMapping
     public ResponseEntity<List<RoleDto>> createRoles(@RequestBody RoleRequest roleRequest) {
         List<RoleDto> savedRoles = roleService.createRoles(roleRequest.getRoles());
@@ -45,12 +54,12 @@ public class RoleController {
     @DeleteMapping
     ResponseEntity<Map<String, String>> delete(@RequestBody List<Long> ids) {
         roleService.delete(ids);
-        return ResponseEntity.ok(Map.of("message", "delete roles success"));
+        return ResponseEntity.ok(Map.of("success", "delete roles success"));
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
         roleService.delete(id);
-        return ResponseEntity.ok(Map.of("message", "delete role success"));
+        return ResponseEntity.ok(Map.of("success", "delete role success"));
     }
 }

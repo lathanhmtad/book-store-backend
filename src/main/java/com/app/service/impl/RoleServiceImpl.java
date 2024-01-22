@@ -3,8 +3,8 @@ package com.app.service.impl;
 import com.app.entity.Role;
 import com.app.exception.BookStoreApiException;
 import com.app.exception.ResourceNotFoundException;
+import com.app.payload.PaginationResponse;
 import com.app.payload.role.RoleDto;
-import com.app.payload.role.RoleResponse;
 import com.app.repository.RoleRepo;
 import com.app.service.RoleService;
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleResponse listAll(Integer pageNumber, Integer limit) {
+    public PaginationResponse<RoleDto> listAll(Integer pageNumber, Integer limit) {
         try {
             Sort sort = Sort.by("id").descending();
             Pageable pageable = PageRequest.of(pageNumber - 1, limit, sort);
@@ -44,7 +44,7 @@ public class RoleServiceImpl implements RoleService {
 
             List<RoleDto> roles = page.getContent().stream().map(item -> modelMapper.map(item, RoleDto.class)).collect(Collectors.toList());
 
-            return RoleResponse.builder()
+            return PaginationResponse.<RoleDto>builder()
                     .data(roles)
                     .pageNumber(pageNumber)
                     .pageSize(limit)
@@ -52,10 +52,15 @@ public class RoleServiceImpl implements RoleService {
                     .totalElements((int) page.getTotalElements())
                     .last(page.isLast())
                     .build();
-
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public RoleDto getRoleById(Long roleId) {
+        Role entity = roleRepo.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("Role", "id", String.valueOf(roleId)));
+        return modelMapper.map(entity, RoleDto.class);
     }
 
     @Override

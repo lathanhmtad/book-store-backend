@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
     public JwtAuthenticationFilter(HandlerExceptionResolver handlerExceptionResolver) {
         this.handlerExceptionResolver = handlerExceptionResolver;
-    };
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

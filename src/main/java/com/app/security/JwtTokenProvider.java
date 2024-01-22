@@ -1,15 +1,11 @@
 package com.app.security;
 
-import com.app.constant.AppConstant;
+import com.app.utils.TimeConverterUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 import java.security.Key;
 import java.util.Date;
@@ -19,8 +15,8 @@ public class JwtTokenProvider {
     @Value("${com.app.jwt.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${com.app.jwt.jwtExpirationMs}")
-    private int jwtExpirationMs;
+    @Value("${com.app.jwt.jwtExpiration}")
+    private String jwtExpiration;
 
     public boolean validateJwtToken(String authToken) {
         try {
@@ -38,6 +34,7 @@ public class JwtTokenProvider {
     }
     public String generateTokenFromUsername(String username) {
         Date currentDate = new Date();
+        long jwtExpirationMs = TimeConverterUtil.getMilliseconds(jwtExpiration);
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationMs);
 
         String token = Jwts.builder()
@@ -57,14 +54,6 @@ public class JwtTokenProvider {
                 .getBody();
         String username = claims.getSubject();
         return username;
-    }
-    public String getRefreshTokenFromCookies(HttpServletRequest servletRequest) {
-        Cookie cookie = WebUtils.getCookie(servletRequest, AppConstant.NAME_REFRESH_TOKEN_COOKIE);
-        return cookie != null ? cookie.getValue() : null;
-    }
-    public ResponseCookie getCleanRefreshTokenCookie() {
-        ResponseCookie cookie = ResponseCookie.from(AppConstant.NAME_REFRESH_TOKEN_COOKIE, null).path("/").build();
-        return cookie;
     }
     private Key key() {
         return Keys.hmacShaKeyFor(

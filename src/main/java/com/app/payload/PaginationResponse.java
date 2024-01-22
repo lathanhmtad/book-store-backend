@@ -1,16 +1,17 @@
-package com.app.payload.user;
+package com.app.payload;
 
-import lombok.*;
+import com.app.payload.user.UserDto;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserResponse {
-    private List<UserDto> data;
+public class PaginationResponse<T> {
+    private List<T> data;
     private Integer pageNumber;
     private Integer pageSize;
     private Integer totalElements;

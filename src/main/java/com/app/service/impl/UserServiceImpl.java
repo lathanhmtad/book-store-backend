@@ -4,11 +4,12 @@ import com.app.constant.CloudinaryUploadFolderConstant;
 import com.app.entity.User;
 import com.app.exception.BookStoreApiException;
 import com.app.exception.ResourceNotFoundException;
+import com.app.payload.PaginationResponse;
 import com.app.payload.user.UserDto;
 import com.app.payload.user.UserRequest;
-import com.app.payload.user.UserResponse;
 import com.app.repository.RoleRepo;
 import com.app.repository.UserRepo;
+import com.app.security.MyUserDetails;
 import com.app.service.CloudinaryImageService;
 import com.app.service.UserService;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,14 +56,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUsers(Integer pageNumber, Integer limit) {
+    public PaginationResponse<UserDto> getUsers(Integer pageNumber, Integer limit) {
         Sort sort = Sort.by("id").descending();
         Pageable pageable = PageRequest.of(pageNumber - 1, limit, sort);
         Page<User> page = userRepo.findAll(pageable) ;
 
         List<User> users = page.getContent();
 
-        UserResponse response = UserResponse.builder()
+        PaginationResponse<UserDto> response = PaginationResponse.<UserDto>builder()
                 .data(users.stream().map(item -> modelMapper.map(item, UserDto.class)).collect(Collectors.toList()))
                 .totalPages(page.getTotalPages())
                 .totalElements((int) page.getTotalElements())
@@ -70,6 +72,19 @@ public class UserServiceImpl implements UserService {
                 .last(page.isLast())
                 .build();
         return response;
+    }
+
+    @Override
+    public UserDto getUserById(Long userId) {
+        User userEntity = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", String.valueOf(userId)));
+        return modelMapper.map(userEntity, UserDto.class);
+    }
+
+    @Override
+    public UserDto retrieveCurrentUser() {
+        MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = userDetails.getId();
+        return getUserById(currentUserId);
     }
 
     @Override

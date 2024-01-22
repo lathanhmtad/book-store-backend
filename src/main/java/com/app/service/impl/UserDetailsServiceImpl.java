@@ -3,7 +3,6 @@ package com.app.service.impl;
 import com.app.entity.Privilege;
 import com.app.entity.Role;
 import com.app.entity.User;
-import com.app.exception.ResourceNotFoundException;
 import com.app.repository.UserRepo;
 import com.app.security.MyUserDetails;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

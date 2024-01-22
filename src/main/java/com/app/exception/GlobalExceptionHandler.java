@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
         return handleException(exception, webRequest, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({TokenRefreshException.class, AccountBlockedException.class, TokenRefreshException.class})
+    @ExceptionHandler({TokenRefreshException.class, AccountBlockedException.class})
     public ResponseEntity<ExceptionResponse> handleTokenRefreshException(RuntimeException exception, WebRequest webRequest) {
         return handleException(exception, webRequest, HttpStatus.FORBIDDEN);
     }
