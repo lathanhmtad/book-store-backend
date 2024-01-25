@@ -39,6 +39,4 @@ public class User extends BaseEntity {
         this.photo = photo;
         this.roles = roles;
     }
-
-
 }

@@ -1,8 +1,7 @@
 package com.app.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Collection;
@@ -13,13 +12,15 @@ import java.util.Collection;
 @Getter
 @Setter
 @Entity
-public class Privilege extends BaseEntity{
+public class Privilege {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(unique = true)
     private String name;
 
-    private String description;
-
     @ManyToMany(mappedBy = "privileges")
+    @JsonIgnore
     private Collection<Role> roles;
 }

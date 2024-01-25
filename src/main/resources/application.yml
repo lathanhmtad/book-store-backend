@@ -26,4 +26,4 @@ com:
     jwt:
       jwtSecret: ======================jwt=spring===========================
       jwtExpiration: 2 minutes
-      jwtRefreshExpiration: 30 minutes
+      jwtRefreshExpiration: 4 hours

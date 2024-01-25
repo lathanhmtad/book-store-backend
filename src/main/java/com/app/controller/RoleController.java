@@ -1,6 +1,7 @@
 package com.app.controller;
 
 import com.app.constant.AppConstant;
+import com.app.entity.Privilege;
 import com.app.payload.PaginationResponse;
 import com.app.payload.role.RoleDto;
 import com.app.payload.role.RoleRequest;
@@ -31,7 +32,6 @@ public class RoleController {
         PaginationResponse<RoleDto> result = roleService.listAll(page, limit);
         return ResponseEntity.ok(result);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<RoleDto> getRole(
             @PathVariable("id") Long roleId
@@ -39,11 +39,22 @@ public class RoleController {
         RoleDto res = roleService.getRoleById(roleId);
         return ResponseEntity.ok(res);
     }
+    @GetMapping("/permissions")
+    public ResponseEntity<List<Privilege>> getPermission(
+            @RequestParam(value = "roleId") Long roleId
+    ) {
+        return ResponseEntity.ok(roleService.getPermissionByRoleId(roleId));
+    }
 
     @PostMapping
     public ResponseEntity<List<RoleDto>> createRoles(@RequestBody RoleRequest roleRequest) {
         List<RoleDto> savedRoles = roleService.createRoles(roleRequest.getRoles());
         return ResponseEntity.ok(savedRoles);
+    }
+    @PostMapping("/assign-permission")
+    public ResponseEntity<Map<String,String>> assignRolePermissions(@RequestBody RoleRequest request) {
+        roleService.assignPermission(request.getRoleId(), request.getPermissions());
+        return ResponseEntity.ok(Map.of("Success", "Assign permission for role success!"));
     }
 
     @PutMapping("/{id}")
@@ -51,12 +62,12 @@ public class RoleController {
         RoleDto updatedRole = roleService.update(id, data);
         return ResponseEntity.ok(updatedRole);
     }
+
     @DeleteMapping
     ResponseEntity<Map<String, String>> delete(@RequestBody List<Long> ids) {
         roleService.delete(ids);
         return ResponseEntity.ok(Map.of("success", "delete roles success"));
     }
-
     @DeleteMapping("/{id}")
     ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
         roleService.delete(id);

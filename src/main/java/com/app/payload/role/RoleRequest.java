@@ -9,4 +9,6 @@ import java.util.List;
 @Setter
 public class RoleRequest {
     private List<RoleDto> roles;
+    private List<Long> permissions;
+    private Long roleId;
 }
