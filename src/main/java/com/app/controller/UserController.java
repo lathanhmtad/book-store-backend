@@ -1,6 +1,7 @@
 package com.app.controller;
 
 import com.app.constant.AppConstant;
+import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.payload.user.UserDto;
 import com.app.payload.user.UserRequest;
@@ -8,16 +9,13 @@ import com.app.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
-
     private UserService userService;
-
     @GetMapping
     public ResponseEntity<PaginationResponse<UserDto>> getUsers(
             @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER, required = false) Integer page,
@@ -40,14 +38,19 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createNewUser(@ModelAttribute UserRequest userRequest) {
-        UserDto response = userService.createNewUser(userRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BaseResponse> createNewUser(@ModelAttribute UserRequest userRequest) {
+        BaseResponse baseResponse = userService.createNewUser(userRequest);
+        return ResponseEntity.ok(baseResponse);
     }
 
+    @PostMapping("/import")
+    public ResponseEntity<BaseResponse> importUserData(@RequestParam("file") MultipartFile importFile) {
+        BaseResponse baseResponse = userService.importUserData(importFile);
+        return ResponseEntity.ok(baseResponse);
+    }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok(Map.of("message", "delete user success"));
+    public ResponseEntity<BaseResponse> deleteUser(@PathVariable Long id) {
+        BaseResponse baseResponse = userService.deleteUser(id);
+        return ResponseEntity.ok(baseResponse);
     }
 }

@@ -3,7 +3,7 @@ package com.app.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -20,6 +20,5 @@ public class RefreshToken extends BaseEntity {
     private String token;
 
     @Column(nullable = false)
-    private Instant expiryDate;
-
+    private Date expiryDate;
 }

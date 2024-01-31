@@ -18,6 +18,7 @@
 		<io.jsonwebtoken.version>0.11.5</io.jsonwebtoken.version>
 		<modelMapper.version>3.0.0</modelMapper.version>
 		<cloudinary.version>1.36.0</cloudinary.version>
+		<poi-ooxml.version>5.2.0</poi-ooxml.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -88,6 +89,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi-ooxml.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

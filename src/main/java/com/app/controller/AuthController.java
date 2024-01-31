@@ -16,6 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private AuthService authService;
+    @GetMapping("/logout/{id}")
+    public ResponseEntity<?> logout(@PathVariable("id") Long userId) {
+        ResponseCookie clearCookie = authService.doLogout(userId);
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
+                .build();
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -28,14 +35,6 @@ public class AuthController {
     public ResponseEntity<TokenRefreshResponse> refreshToken(HttpServletRequest request) {
         TokenRefreshResponse res = authService.processRefreshToken(request);
         return ResponseEntity.ok(res);
-    }
-
-    @GetMapping("/logout/{id}")
-    public ResponseEntity<?> logout(@PathVariable("id") Long userId) {
-        ResponseCookie clearCookie = authService.doLogout(userId);
-        return ResponseEntity.noContent()
-                .header(HttpHeaders.SET_COOKIE, clearCookie.toString())
-                .build();
     }
 }
 

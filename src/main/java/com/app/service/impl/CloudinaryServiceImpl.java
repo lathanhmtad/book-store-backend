@@ -1,6 +1,6 @@
 package com.app.service.impl;
 
-import com.app.service.CloudinaryImageService;
+import com.app.service.CloudinaryService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,11 +9,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 @Service
-public class CloudinaryImageServiceImpl implements CloudinaryImageService {
+public class CloudinaryServiceImpl implements CloudinaryService {
     @Value("${com.app.cloudinary.rootFolder}")
     private String rootFolder;
     private Cloudinary cloudinary;
-    public CloudinaryImageServiceImpl(Cloudinary cloudinary) {
+    public CloudinaryServiceImpl(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
     @Override

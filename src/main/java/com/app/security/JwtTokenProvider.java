@@ -1,6 +1,6 @@
 package com.app.security;
 
-import com.app.utils.TimeConverterUtil;
+import com.app.util.TimeConverterUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

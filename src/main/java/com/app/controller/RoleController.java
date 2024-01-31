@@ -1,76 +1,31 @@
 package com.app.controller;
 
-import com.app.constant.AppConstant;
-import com.app.entity.Privilege;
-import com.app.payload.PaginationResponse;
-import com.app.payload.role.RoleDto;
-import com.app.payload.role.RoleRequest;
-import com.app.service.RoleService;
+import com.app.entity.Role;
+import com.app.repository.RoleRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/roles")
 public class RoleController {
-    private RoleService roleService;
+    private RoleRepo roleRepo;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<RoleDto>> getRoles() {
-        List<RoleDto> roles = roleService.listAll();
-        return ResponseEntity.ok(roles);
-    }
     @GetMapping
-    public ResponseEntity<PaginationResponse<RoleDto>> getRoles(
-            @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER, required = false) Integer page,
-            @RequestParam(value = "limit", defaultValue = AppConstant.ROLES_DEFAULT_PAGE_SIZE, required = false) Integer limit
-    ) {
-        PaginationResponse<RoleDto> result = roleService.listAll(page, limit);
-        return ResponseEntity.ok(result);
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<RoleDto> getRole(
-            @PathVariable("id") Long roleId
-    ) {
-        RoleDto res = roleService.getRoleById(roleId);
-        return ResponseEntity.ok(res);
-    }
-    @GetMapping("/permissions")
-    public ResponseEntity<List<Privilege>> getPermission(
-            @RequestParam(value = "roleId") Long roleId
-    ) {
-        return ResponseEntity.ok(roleService.getPermissionByRoleId(roleId));
-    }
-
-    @PostMapping
-    public ResponseEntity<List<RoleDto>> createRoles(@RequestBody RoleRequest roleRequest) {
-        List<RoleDto> savedRoles = roleService.createRoles(roleRequest.getRoles());
-        return ResponseEntity.ok(savedRoles);
-    }
-    @PostMapping("/assign-permission")
-    public ResponseEntity<Map<String,String>> assignRolePermissions(@RequestBody RoleRequest request) {
-        roleService.assignPermission(request.getRoleId(), request.getPermissions());
-        return ResponseEntity.ok(Map.of("Success", "Assign permission for role success!"));
-    }
-
-    @PutMapping("/{id}")
-    ResponseEntity<RoleDto> updateRole(@PathVariable Long id, @RequestBody RoleDto data) {
-        RoleDto updatedRole = roleService.update(id, data);
-        return ResponseEntity.ok(updatedRole);
-    }
-
-    @DeleteMapping
-    ResponseEntity<Map<String, String>> delete(@RequestBody List<Long> ids) {
-        roleService.delete(ids);
-        return ResponseEntity.ok(Map.of("success", "delete roles success"));
-    }
-    @DeleteMapping("/{id}")
-    ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
-        roleService.delete(id);
-        return ResponseEntity.ok(Map.of("success", "delete role success"));
+    public ResponseEntity<List<Role>> getRoles() {
+        List<Role> roles = roleRepo.findAll();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl(CacheControl.maxAge(2, TimeUnit.MINUTES));
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(roles);
     }
 }

@@ -11,5 +11,6 @@ import java.util.List;
 public class UserRequest extends UserDto {
     private String password;
     private MultipartFile image;
-    private List<Long> roleIds;
+    private List<Integer> roleIds;
+    private List<String> roleNames;
 }

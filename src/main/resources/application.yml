@@ -25,5 +25,5 @@ com:
       rootFolder: book-store-images
     jwt:
       jwtSecret: ======================jwt=spring===========================
-      jwtExpiration: 2 minutes
-      jwtRefreshExpiration: 4 hours
+      jwtExpiration: 3 hour
+      jwtRefreshExpiration: 5 hour

@@ -21,9 +21,9 @@ import java.util.Arrays;
 
 @Configuration
 @EnableMethodSecurity
-public class WebSecurityConfig {
+public class AppSecurityConfig {
     private HandlerExceptionResolver exceptionResolver;
-    public WebSecurityConfig(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
+    public AppSecurityConfig(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
         this.exceptionResolver = exceptionResolver;
     }
     @Bean

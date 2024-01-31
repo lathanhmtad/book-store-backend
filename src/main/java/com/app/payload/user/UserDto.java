@@ -15,7 +15,6 @@ public class UserDto extends AuditableDto<Long> {
     private Long id;
     private String email;
     private String fullName;
-    private String phoneNumber;
     private String photo;
     private Boolean enabled;
     private List<RoleDto> roles;

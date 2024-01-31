@@ -14,8 +14,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import java.io.IOException;
-
 @Component
 public class JwtAuthenticationFilter  extends OncePerRequestFilter {
     private HandlerExceptionResolver handlerExceptionResolver;
@@ -27,8 +25,7 @@ public class JwtAuthenticationFilter  extends OncePerRequestFilter {
         this.handlerExceptionResolver = handlerExceptionResolver;
     }
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         try {
             // get JWT token from http request
             String token = getTokenFromRequest(request);
