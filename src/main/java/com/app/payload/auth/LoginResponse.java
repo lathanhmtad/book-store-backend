@@ -10,6 +10,7 @@ import org.springframework.http.ResponseCookie;
 public class LoginResponse {
     private String accessToken;
     private final String tokenType = "Bearer";
+
     @JsonIgnore
     private ResponseCookie refreshTokenCookie;
 }

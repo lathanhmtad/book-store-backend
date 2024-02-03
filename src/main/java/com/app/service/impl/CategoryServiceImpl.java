@@ -7,11 +7,10 @@ import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.payload.category.CategoryDto;
 import com.app.payload.category.CategoryRequest;
-import com.app.payload.category.CategoryTreeResponse;
+import com.app.payload.category.CategoryTreeDto;
 import com.app.repository.CategoryRepo;
 import com.app.service.CategoryService;
 import com.app.util.ExcelUtil;
-import com.app.util.FileFactory;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.modelmapper.ModelMapper;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -35,35 +33,32 @@ public class CategoryServiceImpl implements CategoryService {
     private ModelMapper modelMapper;
 
     @Override
-    public List<CategoryTreeResponse> getCategoriesTree() {
+    public List<CategoryTreeDto> getCategoriesTree() {
         try {
             List<Category> categoriesInDb = categoryRepo.findAll();
 
-            List<CategoryTreeResponse> response = new ArrayList<>();
+            List<CategoryTreeDto> response = new ArrayList<>();
 
-            for (int i = 0; i < categoriesInDb.size(); i++) {
-                if(categoriesInDb.get(i).getParent() == null) {
-                    response.add(CategoryTreeResponse.builder()
-                            .title(categoriesInDb.get(i).getName())
-                            .value(categoriesInDb.get(i).getId())
-                            .children(new ArrayList<>())
-                            .build());
-                    Set<Category> children = categoriesInDb.get(i).getChildren();
-                    for(Category subCategory : children) {
-
-                        response.get(i).getChildren().add(CategoryTreeResponse.builder()
-                                .title(subCategory.getName())
-                                .value(subCategory.getId())
-                                .children(new ArrayList<>())
-                                .build());
-                        listChildren(response.get(i).getChildren(), subCategory, 1);
-                    }
+            for(Category category : categoriesInDb) {
+                if(category.getParent() == null) {
+                    response.add(new CategoryTreeDto(
+                            category.getName(),
+                            category.getId()
+                    ));
+                    this.addChildren(response.get(response.size() - 1).getChildren(), category, 1);
                 }
             }
+
+            response.add(0, new CategoryTreeDto("No parent", -1L));
             return response;
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public CategoryTreeDto getCategoryTree() {
+        return null;
     }
 
     @Override
@@ -86,10 +81,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public BaseResponse createNewCategory(CategoryRequest request) {
         try {
-            modelMapper.getConfiguration().setAmbiguityIgnored(true);
             Category parent = null;
-            if(request.getParentId() != null) {
-                parent = categoryRepo.findById(request.getParentId()).get();
+            if(request.getParentId() != null && request.getParentId() != -1) {
+                parent = categoryRepo.findById(request.getParentId()).orElseThrow(
+                        () -> new BookStoreApiException("Category parent not found for id " + request.getParentId(), HttpStatus.BAD_REQUEST)
+                );
             }
             else if(request.getParentName() != null) {
                 parent = categoryRepo.findByName(request.getParentName());
@@ -102,17 +98,16 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
     @Override
     public BaseResponse importCategoryData(MultipartFile file) {
         try {
             boolean isValid = ExcelUtil.isValidExcelFile(file);
             if(isValid) {
-                Workbook workbook = FileFactory.getWorkbookStream(file);
+                Workbook workbook = ExcelUtil.getWorkbookStream(file);
                 List<CategoryRequest> categoryDtos = ExcelUtil.getImportData(workbook, ExcelImportConfig.categoryImportConfig);
 
-                categoryDtos.forEach(item -> {
-                    this.createNewCategory(item);
-                });
+                categoryDtos.forEach(this::createNewCategory);
 
                 return new BaseResponse(200, "Create success");
             }
@@ -122,17 +117,19 @@ public class CategoryServiceImpl implements CategoryService {
         return null;
     }
 
-    private void listChildren(List<CategoryTreeResponse> response, Category parent, int subLevel) {
-        int newSubLevel = subLevel + 1;
-        Set<Category> children = parent.getChildren();
+    @Override
+    public BaseResponse updateCategory(CategoryRequest categoryRequest) {
+        return null;
+    }
 
-        for(Category subCategory : children) {
-            response.get(subLevel -1).getChildren().add(CategoryTreeResponse.builder()
-                    .title(subCategory.getName())
-                    .value(subCategory.getId())
-                    .children(new ArrayList<>())
-                    .build());
-            listChildren(response.get(subLevel - 1).getChildren(), subCategory, newSubLevel);
+    private void addChildren(List<CategoryTreeDto> list, Category category, int depth) {
+        for(Category child : category.getChildren()) {
+            CategoryTreeDto childResponse = new CategoryTreeDto(
+                    child.getName(),
+                    child.getId()
+            );
+            list.add(childResponse);
+            addChildren(childResponse.getChildren(), child, depth + 1);
         }
     }
 }

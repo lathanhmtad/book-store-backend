@@ -6,6 +6,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,16 @@ import java.util.List;
 import java.util.Objects;
 
 public class ExcelUtil {
+    public static Workbook getWorkbookStream(MultipartFile importFile) {
+        try {
+            InputStream inputStream;
+            inputStream = importFile.getInputStream();
+            return WorkbookFactory.create(inputStream);
+        } catch (IOException e)  {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public static boolean isValidExcelFile(MultipartFile file) {
         return Objects.equals(file.getContentType(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     }
@@ -124,6 +136,10 @@ public class ExcelUtil {
 
     private static Object parseList(Object value) {
         Object[] stringObj = value.toString().split(",");
+
+        for (int i = 0; i < stringObj.length; i++) {
+            stringObj[i] = stringObj[i].toString().trim();
+        }
         return Arrays.asList(stringObj);
     }
 }

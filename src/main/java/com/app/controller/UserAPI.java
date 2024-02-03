@@ -4,7 +4,7 @@ import com.app.constant.AppConstant;
 import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.payload.user.UserDto;
-import com.app.payload.user.UserRequest;
+import com.app.payload.user.UserCreationDto;
 import com.app.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/users")
-public class UserController {
+public class UserAPI {
     private UserService userService;
-    @GetMapping
-    public ResponseEntity<PaginationResponse<UserDto>> getUsers(
-            @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER, required = false) Integer page,
-            @RequestParam(value = "limit", defaultValue = AppConstant.USER_DEFAULT_PAGE_SIZE) Integer limit
-    ) {
-        PaginationResponse<UserDto> response = userService.getUsers(page, limit);
-        return ResponseEntity.ok(response);
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long userId) {
@@ -37,15 +29,31 @@ public class UserController {
         return ResponseEntity.ok(res);
     }
 
-    @PostMapping
-    public ResponseEntity<BaseResponse> createNewUser(@ModelAttribute UserRequest userRequest) {
-        BaseResponse baseResponse = userService.createNewUser(userRequest);
-        return ResponseEntity.ok(baseResponse);
+    @GetMapping
+    public ResponseEntity<PaginationResponse<UserDto>> getUsers(
+            @RequestParam(value = "page", defaultValue = AppConstant.DEFAULT_PAGE_NUMBER, required = false) Integer page,
+            @RequestParam(value = "limit", defaultValue = AppConstant.USER_DEFAULT_PAGE_SIZE) Integer limit
+    ) {
+        PaginationResponse<UserDto> response = userService.getUsers(page, limit);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/import")
     public ResponseEntity<BaseResponse> importUserData(@RequestParam("file") MultipartFile importFile) {
         BaseResponse baseResponse = userService.importUserData(importFile);
+        return ResponseEntity.ok(baseResponse);
+    }
+
+    @PostMapping
+    public ResponseEntity<BaseResponse> createNewUser(@ModelAttribute UserCreationDto userRequest) {
+        BaseResponse baseResponse = userService.saveUser(userRequest);
+        return ResponseEntity.ok(baseResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponse> updateUser(@PathVariable("id") Long userId, @ModelAttribute UserCreationDto userRequest) {
+        userRequest.setId(userId);
+        BaseResponse baseResponse = userService.saveUser(userRequest);
         return ResponseEntity.ok(baseResponse);
     }
     @DeleteMapping("/{id}")

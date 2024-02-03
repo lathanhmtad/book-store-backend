@@ -5,7 +5,6 @@ import com.app.payload.role.RoleDto;
 import lombok.*;
 
 import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

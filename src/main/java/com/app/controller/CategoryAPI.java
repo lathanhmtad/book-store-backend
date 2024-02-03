@@ -5,7 +5,7 @@ import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.payload.category.CategoryDto;
 import com.app.payload.category.CategoryRequest;
-import com.app.payload.category.CategoryTreeResponse;
+import com.app.payload.category.CategoryTreeDto;
 import com.app.service.CategoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/categories")
-public class CategoryController {
+public class CategoryAPI {
     private CategoryService categoryService;
     @GetMapping
     public ResponseEntity<PaginationResponse<CategoryDto>> getCategories(
@@ -28,8 +28,8 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
     @GetMapping("/tree")
-    public ResponseEntity<List<CategoryTreeResponse>> getCategories() {
-        List<CategoryTreeResponse> response = categoryService.getCategoriesTree();
+    public ResponseEntity<List<CategoryTreeDto>> getCategories() {
+        List<CategoryTreeDto> response = categoryService.getCategoriesTree();
         return ResponseEntity.ok(response);
     }
     @PostMapping

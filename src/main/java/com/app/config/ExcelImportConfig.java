@@ -1,10 +1,10 @@
 package com.app.config;
 
+import com.app.payload.brand.BrandRequest;
 import com.app.payload.category.CategoryRequest;
-import com.app.payload.user.UserRequest;
+import com.app.payload.user.UserCreationDto;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,13 +21,14 @@ public class ExcelImportConfig {
 
     public static ExcelImportConfig userImportConfig;
     public static ExcelImportConfig categoryImportConfig;
+    public static ExcelImportConfig brandImportConfig;
 
     static {
         userImportConfig = ExcelImportConfig.builder()
                 .sheetName("Users")
                 .headerIndex(0)
                 .startRow(1)
-                .dataClazz(UserRequest.class)
+                .dataClazz(UserCreationDto.class)
                 .build();
 
         List<ExcelCellConfig> userCellConfigs = List.of(
@@ -54,5 +55,19 @@ public class ExcelImportConfig {
                 new ExcelCellConfig(2, "parentName")
         );
         categoryImportConfig.setCellImportConfigs(categoryCellConfigs);
+    }
+
+    static {
+        brandImportConfig = ExcelImportConfig.builder()
+                .sheetName("Brands")
+                .headerIndex(0)
+                .startRow(1)
+                .dataClazz(BrandRequest.class)
+                .build();
+        List<ExcelCellConfig> brandCellConfigs = List.of(
+                new ExcelCellConfig(0, "name"),
+                new ExcelCellConfig(1, "categories")
+        );
+        brandImportConfig.setCellImportConfigs(brandCellConfigs);
     }
 }

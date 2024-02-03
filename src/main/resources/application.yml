@@ -11,9 +11,18 @@ spring:
         format_sql: true
     open-in-view: true
   datasource:
+    # local
     url: jdbc:mysql://localhost:3306/book_store?createDatabaseIfNotExist=true
     username: root
     password: 1234
+
+    # remote
+#    url: jdbc:mysql://sql6.freesqldatabase.com:3306/sql6681694
+#    username: sql6681694
+#    password: 3H2GPkmg72
+  jackson:
+    date-format: dd-MM-yyyy HH:mm:ss
+    time-zone: GMT+7
 
 # app properties
 com:

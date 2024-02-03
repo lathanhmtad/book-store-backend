@@ -8,9 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class UserRequest extends UserDto {
+public class UserCreationDto extends UserDto {
     private String password;
-    private MultipartFile image;
+    private MultipartFile imageFile;
     private List<Integer> roleIds;
     private List<String> roleNames;
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthAPI {
     private AuthService authService;
     @GetMapping("/logout/{id}")
     public ResponseEntity<?> logout(@PathVariable("id") Long userId) {

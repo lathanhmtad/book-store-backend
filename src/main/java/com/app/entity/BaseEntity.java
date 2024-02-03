@@ -15,4 +15,10 @@ public class BaseEntity extends Auditable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private Boolean deleted = Boolean.FALSE;
+
+    public BaseEntity(Long id) {
+        this.id = id;
+    }
 }

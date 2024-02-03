@@ -9,14 +9,13 @@ import com.app.exception.ResourceNotFoundException;
 import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.payload.user.UserDto;
-import com.app.payload.user.UserRequest;
+import com.app.payload.user.UserCreationDto;
 import com.app.repository.RoleRepo;
 import com.app.repository.UserRepo;
 import com.app.security.MyUserDetails;
 import com.app.service.CloudinaryService;
 import com.app.service.UserService;
 import com.app.util.ExcelUtil;
-import com.app.util.FileFactory;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.modelmapper.ModelMapper;
@@ -32,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +42,25 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
     private UserRepo userRepo;
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    public UserDto getUserById(Long userId) {
+        try {
+            User userEntity = userRepo.findById(userId).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "id", String.valueOf(userId)));
+            return modelMapper.map(userEntity, UserDto.class);
+        } catch (Exception e) {
+            throw new BookStoreApiException(e.getMessage(), HttpStatus.PROCESSING);
+        }
+    }
+
+    @Override
+    public UserDto retrieveCurrentUser() {
+        MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = userDetails.getId();
+        return getUserById(currentUserId);
+    }
+
     @Override
     public PaginationResponse<UserDto> getUsers(Integer pageNumber, Integer limit) {
         Sort sort = Sort.by("id").descending();
@@ -62,41 +81,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
-        User userEntity = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", String.valueOf(userId)));
-        return modelMapper.map(userEntity, UserDto.class);
-    }
-
-    @Override
-    public UserDto retrieveCurrentUser() {
-        MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long currentUserId = userDetails.getId();
-        return getUserById(currentUserId);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public BaseResponse createNewUser(UserRequest userRequest) {
-        try {
-            User userEntity = modelMapper.map(userRequest, User.class);
-            if(userRequest.getRoleIds() != null) {
-                userEntity.setRoles(roleRepo.findAllById(userRequest.getRoleIds()));
-            }
-            if(userRequest.getRoleNames() != null) {
-                userEntity.setRoles(roleRepo.findAllByName(userRequest.getRoleNames()));
-            }
-            MultipartFile multipartFile = userRequest.getImage();
-            if(multipartFile != null) {
-                String imgUrl = cloudinaryImageService.upload(multipartFile, CloudinaryUploadFolderConstant.USER_IMG_FOLDER);
-                userEntity.setPhoto(imgUrl);
-            }
-            else {
-                userEntity.setPhoto(AppConstant.USER_DEFAULT_IMAGE);
-            }
-            userEntity.setPassword(encodePassword(userEntity.getPassword()));
-            userRepo.save(userEntity);
+    public BaseResponse saveUser(UserCreationDto userRequest) {
+        if(!this.isEmailUnique(userRequest.getId(), userRequest.getEmail()))
+            throw new BookStoreApiException("Email already exists, please use another email!", HttpStatus.CONFLICT);
 
-            return new BaseResponse(200, "Create new user success!");
+        boolean isUpdatingUser = userRequest.getId() != null;
+        try {
+            if(isUpdatingUser) {
+                User existingUser = userRepo.findById(userRequest.getId()).get();
+                this.mapUserRequestToUserEntity(userRequest, existingUser);
+                userRepo.save(existingUser);
+                return new BaseResponse(200, "Update user success!");
+            }
+            User userEntity = new User();
+            this.mapUserRequestToUserEntity(userRequest, userEntity);
+            userRepo.save(userEntity);
+            return new BaseResponse(200, "Create user success!");
         } catch (Exception e) {
             throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -107,11 +108,11 @@ public class UserServiceImpl implements UserService {
         try {
             boolean isValid = ExcelUtil.isValidExcelFile(importFile);
             if(isValid) {
-                Workbook workbook = FileFactory.getWorkbookStream(importFile);
-                List<UserRequest> userDtos = ExcelUtil.getImportData(workbook, ExcelImportConfig.userImportConfig);
+                Workbook workbook = ExcelUtil.getWorkbookStream(importFile);
+                List<UserCreationDto> userDtos = ExcelUtil.getImportData(workbook, ExcelImportConfig.userImportConfig);
 
                 userDtos.forEach((userDto) -> {
-                    this.createNewUser(userDto);
+                    this.saveUser(userDto);
                 });
 
                 return new BaseResponse(200, "Create new user success!");
@@ -141,4 +142,45 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.encode(rawPassword);
     }
 
+    private boolean isEmailUnique(Long userId, String email) {
+        Optional<User> userByEmail = userRepo.findByEmail(email);
+
+        if(userByEmail.isEmpty()) return true;
+
+        boolean isCreatingNew = (userId == null);
+
+        if(isCreatingNew) {
+            if(userByEmail.isPresent()) return false;
+        } else {
+            if(userByEmail.get().getId() != userId) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void mapUserRequestToUserEntity(UserCreationDto source, User destination) throws Exception {
+        modelMapper.map(source, destination);
+        if(source.getRoleIds() != null) {
+            destination.setRoles(roleRepo.findAllById(source.getRoleIds()));
+        }
+        if(source.getRoleNames() != null) {
+            destination.setRoles(roleRepo.findAllByName(source.getRoleNames()));
+        }
+
+        MultipartFile imageFile = source.getImageFile();
+        destination.setPhoto(
+                imageFile == null ?
+                        ((destination.getPhoto() == null ? AppConstant.USER_DEFAULT_IMAGE : destination.getPhoto()))
+                        :
+                        cloudinaryImageService.upload(imageFile, CloudinaryUploadFolderConstant.USER_IMG_FOLDER)
+        );
+
+        if(source.getId() != null && source.getPassword().isEmpty()) {
+
+        }
+        else {
+            destination.setPassword(encodePassword(source.getPassword()));
+        }
+    }
 }

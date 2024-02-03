@@ -3,14 +3,14 @@ package com.app.service;
 import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.payload.user.UserDto;
-import com.app.payload.user.UserRequest;
+import com.app.payload.user.UserCreationDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
-    PaginationResponse<UserDto> getUsers(Integer pageNumber, Integer limit);
     UserDto getUserById(Long userId);
     UserDto retrieveCurrentUser();
-    BaseResponse createNewUser(UserRequest userRequest);
+    PaginationResponse<UserDto> getUsers(Integer pageNumber, Integer limit);
     BaseResponse importUserData(MultipartFile importFile);
+    BaseResponse saveUser(UserCreationDto userRequest);
     BaseResponse deleteUser(Long id);
 }

@@ -1,7 +1,7 @@
 package com.app.controller;
 
-import com.app.entity.Role;
-import com.app.repository.RoleRepo;
+import com.app.payload.role.RoleDto;
+import com.app.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -16,16 +16,17 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/roles")
-public class RoleController {
-    private RoleRepo roleRepo;
+public class RoleAPI {
+    private RoleService roleService;
 
     @GetMapping
-    public ResponseEntity<List<Role>> getRoles() {
-        List<Role> roles = roleRepo.findAll();
+    public ResponseEntity<List<RoleDto>> getRoles() {
+        List<RoleDto> response = roleService.getRoles();
+
         HttpHeaders headers = new HttpHeaders();
         headers.setCacheControl(CacheControl.maxAge(2, TimeUnit.MINUTES));
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(roles);
+                .body(response);
     }
 }
