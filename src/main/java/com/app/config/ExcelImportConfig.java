@@ -2,7 +2,7 @@ package com.app.config;
 
 import com.app.payload.brand.BrandRequest;
 import com.app.payload.category.CategoryRequest;
-import com.app.payload.user.UserCreationDto;
+import com.app.payload.user.UserRequest;
 import lombok.*;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class ExcelImportConfig {
                 .sheetName("Users")
                 .headerIndex(0)
                 .startRow(1)
-                .dataClazz(UserCreationDto.class)
+                .dataClazz(UserRequest.class)
                 .build();
 
         List<ExcelCellConfig> userCellConfigs = List.of(

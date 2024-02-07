@@ -1,8 +1,8 @@
 package com.app.config;
 
 import com.app.entity.User;
-import com.app.payload.user.UserCreationDto;
 import com.app.payload.user.UserDto;
+import com.app.payload.user.UserRequest;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-public class ModalMapperConfig {
+public class ModelMapperConfig {
 
     @Bean
     public ModelMapper modelMapper() {
@@ -18,7 +18,7 @@ public class ModalMapperConfig {
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
 
         // setup map user request to user entity
-        TypeMap<UserCreationDto, User> userCreationDtoUserPropertyMapper = modelMapper.createTypeMap(UserCreationDto.class, User.class);
+        TypeMap<UserRequest, User> userCreationDtoUserPropertyMapper = modelMapper.createTypeMap(UserRequest.class, User.class);
         userCreationDtoUserPropertyMapper.addMappings(
                 mapper -> {
                     mapper.skip(User::setCreatedDate);

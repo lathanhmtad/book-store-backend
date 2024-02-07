@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 public class BrandRequest extends BrandDto {
     private MultipartFile imageFile;
-    private List<String> categories;
+    private List<String> categoryNames;
 }
