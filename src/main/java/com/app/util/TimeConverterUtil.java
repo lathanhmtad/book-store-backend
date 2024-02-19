@@ -9,6 +9,7 @@ public class TimeConverterUtil {
         Long number = Long.valueOf(input.substring(0, spaceIndex));
 
         Long result = switch (timeUnit) {
+            case "second", "seconds" -> TimeUnit.SECONDS.toMillis(number);
             case "minute", "minutes" -> TimeUnit.MINUTES.toMillis(number);
             case "hour", "hours" -> TimeUnit.HOURS.toMillis(number);
             case "day", "days" -> TimeUnit.DAYS.toMillis(number);

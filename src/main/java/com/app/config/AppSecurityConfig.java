@@ -22,7 +22,7 @@ import java.util.Arrays;
 @Configuration
 @EnableMethodSecurity
 public class AppSecurityConfig {
-    private HandlerExceptionResolver exceptionResolver;
+    private final HandlerExceptionResolver exceptionResolver;
     public AppSecurityConfig(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
         this.exceptionResolver = exceptionResolver;
     }

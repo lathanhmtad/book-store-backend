@@ -2,8 +2,6 @@ package com.app.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.util.Date;
 
@@ -12,8 +10,6 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE refresh_token SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false or deleted is null")
 @Entity
 public class RefreshToken extends BaseEntity {
     @OneToOne

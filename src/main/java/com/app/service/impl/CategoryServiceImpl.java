@@ -1,16 +1,17 @@
 package com.app.service.impl;
 
-import com.app.config.ExcelImportConfig;
+import com.app.constant.AppConstant;
+import com.app.constant.CloudinaryConstant;
 import com.app.entity.Category;
 import com.app.exception.BookStoreApiException;
-import com.app.payload.BaseResponse;
+import com.app.exception.ResourceNotFoundException;
+import com.app.payload.category.CategoryDetailsDto;
 import com.app.payload.category.CategoryDto;
 import com.app.payload.category.CategoryRequest;
 import com.app.payload.category.CategoryTreeDto;
 import com.app.repository.CategoryRepo;
 import com.app.service.CategoryService;
-import com.app.util.ExcelUtil;
-import org.apache.poi.ss.usermodel.Workbook;
+import com.app.util.CloudinaryUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,17 @@ import java.util.List;
 
 @Service
 public class CategoryServiceImpl extends AbstractBaseServiceImpl<Category, CategoryDto> implements CategoryService {
-    private CategoryRepo categoryRepo;
-    private ModelMapper modelMapper;
+    private final CategoryRepo categoryRepo;
+    private final ModelMapper modelMapper;
+    private final CloudinaryUtil cloudinaryUtil;
 
     public CategoryServiceImpl(CategoryRepo categoryRepo,
-                               ModelMapper modelMapper) {
-        super(categoryRepo, modelMapper, CategoryDto.class, Category.class);
+                               ModelMapper modelMapper,
+                               CloudinaryUtil cloudinaryUtil) {
+        super(categoryRepo, CategoryDto.class, Category.class);
         this.categoryRepo = categoryRepo;
         this.modelMapper = modelMapper;
+        this.cloudinaryUtil = cloudinaryUtil;
     }
 
     @Override
@@ -56,52 +60,75 @@ public class CategoryServiceImpl extends AbstractBaseServiceImpl<Category, Categ
     }
 
     @Override
-    public CategoryTreeDto getCategoryTree() {
-        return null;
+    public CategoryTreeDto getCategoryTree(Long categoryId) {
+        Category categoryInDb = categoryRepo.findById(categoryId).
+                orElseThrow(() -> new ResourceNotFoundException("Category", "id", String.valueOf(categoryId)));
+        CategoryTreeDto categoryTreeDto = new CategoryTreeDto(categoryInDb.getName(), categoryInDb.getId());
+        this.addChildren(categoryTreeDto.getChildren(), categoryInDb, 1);
+        return categoryTreeDto;
     }
 
     @Override
-    public BaseResponse createNewCategory(CategoryRequest request) {
-        try {
-            Category parent = null;
-            if(request.getParentId() != null && request.getParentId() != -1) {
-                parent = categoryRepo.findById(request.getParentId()).orElseThrow(
-                        () -> new BookStoreApiException("Category parent not found for id " + request.getParentId(), HttpStatus.BAD_REQUEST)
-                );
+    public CategoryDto findById(Long categoryId) {
+        Category categoryInDb = categoryRepo.findById(categoryId).
+                orElseThrow(() -> new ResourceNotFoundException("Category", "id", String.valueOf(categoryId)));
+        CategoryDto categoryDto = this.transformEntityToDto(categoryInDb);
+        CategoryDetailsDto categoryDetailsDto = modelMapper.map(categoryDto, CategoryDetailsDto.class);
+        this.addChildren(categoryDetailsDto.getChildren(), categoryInDb, 1);
+        return categoryDetailsDto;
+    }
+
+    @Override
+    public Category transformDtoToEntity(CategoryDto categoryDto) {
+        CategoryRequest categoryRequest = (CategoryRequest) categoryDto;
+        Long categoryId = categoryRequest.getId();
+
+        if(categoryId == null) {
+            // create category
+            Category categoryEntity = modelMapper.map(categoryRequest, Category.class);
+            this.mapParentCategory(categoryEntity, categoryRequest);
+
+            MultipartFile imgFile = categoryRequest.getImageFile();
+            categoryEntity.setImage(
+                    imgFile == null ? AppConstant.CATEGORY_DEFAULT_IMAGE :
+                            cloudinaryUtil.upload(imgFile, CloudinaryConstant.CATEGORY_IMG_FOLDER)
+            );
+            return categoryEntity;
+        }
+        else {
+            // update category
+            Category categoryInDb = categoryRepo.findById(categoryId).
+                    orElseThrow(() -> new ResourceNotFoundException("Category", "id", String.valueOf(categoryId)));
+            modelMapper.map(categoryRequest, categoryInDb);
+            this.mapParentCategory(categoryInDb, categoryRequest);
+
+            MultipartFile imgFile = categoryRequest.getImageFile();
+            if(imgFile != null) {
+                if(!categoryInDb.getImage().equals(AppConstant.CATEGORY_DEFAULT_IMAGE)) {
+                    cloudinaryUtil.delete(categoryInDb.getImage());
+                }
+                categoryInDb.setImage(cloudinaryUtil.upload(imgFile, CloudinaryConstant.USER_IMG_FOLDER));
             }
-            else if(request.getParentName() != null) {
-                parent = categoryRepo.findByName(request.getParentName());
-            }
-            Category entity = modelMapper.map(request, Category.class);
-            entity.setParent(parent);
-            categoryRepo.save(entity);
-            return new BaseResponse(200, "Create success");
-        } catch (Exception e) {
-            throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return categoryInDb;
         }
     }
 
     @Override
-    public BaseResponse importCategoryData(MultipartFile file) {
-        try {
-            boolean isValid = ExcelUtil.isValidExcelFile(file);
-            if(isValid) {
-                Workbook workbook = ExcelUtil.getWorkbookStream(file);
-                List<CategoryRequest> categoryDtos = ExcelUtil.getImportData(workbook, ExcelImportConfig.categoryImportConfig);
-
-                categoryDtos.forEach(this::createNewCategory);
-
-                return new BaseResponse(200, "Create success");
-            }
-        } catch (Exception e) {
-            throw new BookStoreApiException(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        return null;
+    public CategoryDto transformEntityToDto(Category element) {
+        CategoryDto categoryDto = modelMapper.map(element, CategoryDto.class);
+        categoryDto.setHasChildren(element.getChildren().size() > 0);
+        return categoryDto;
     }
 
-    @Override
-    public BaseResponse updateCategory(CategoryRequest categoryRequest) {
-        return null;
+    private void mapParentCategory(Category category, CategoryRequest categoryRequest) {
+        if(categoryRequest.getParentId() != null && categoryRequest.getParentId() != -1) {
+             category.setParent(categoryRepo.findById(categoryRequest.getParentId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Category", "id", String.valueOf(categoryRequest.getId()))
+            ));
+        }
+        else if(categoryRequest.getParentName() != null) {
+            category.setParent(categoryRepo.findByName(categoryRequest.getParentName()));
+        }
     }
 
     private void addChildren(List<CategoryTreeDto> list, Category category, int depth) {
@@ -113,15 +140,5 @@ public class CategoryServiceImpl extends AbstractBaseServiceImpl<Category, Categ
             list.add(childResponse);
             addChildren(childResponse.getChildren(), child, depth + 1);
         }
-    }
-
-    @Override
-    public Category transformDtoToEntity(CategoryDto element) {
-        return null;
-    }
-
-    @Override
-    public CategoryDto transformEntityToDto(Category element) {
-        return null;
     }
 }

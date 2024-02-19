@@ -70,4 +70,13 @@ public class ExcelImportConfig {
         );
         brandImportConfig.setCellImportConfigs(brandCellConfigs);
     }
+
+    public static ExcelImportConfig getImportConfig(String entityName) {
+        return switch (entityName) {
+            case "User" -> userImportConfig;
+            case "Category" -> categoryImportConfig;
+            case "Brand" -> brandImportConfig;
+            default -> throw new IllegalArgumentException("Invalid entity name: " + entityName);
+        };
+    }
 }

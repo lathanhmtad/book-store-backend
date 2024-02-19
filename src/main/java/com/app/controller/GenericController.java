@@ -3,12 +3,14 @@ package com.app.controller;
 import com.app.constant.AppConstant;
 import com.app.entity.BaseEntity;
 import com.app.payload.BaseDto;
+import com.app.payload.BaseResponse;
 import com.app.payload.PaginationResponse;
 import com.app.service.AbstractBaseService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-public class GenericController<TModel extends BaseEntity, TDto extends BaseDto> {
+public class GenericController<TModel extends BaseEntity, TDto extends BaseDto, TDtoRequest extends TDto> {
     private final AbstractBaseService<TModel, TDto> abstractBaseService;
 
     public GenericController(AbstractBaseService<TModel, TDto> abstractBaseService) {
@@ -27,8 +29,37 @@ public class GenericController<TModel extends BaseEntity, TDto extends BaseDto> 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TDto> findById(@PathVariable("id") Long userId) {
-        TDto response = abstractBaseService.findById(userId);
+    public ResponseEntity<TDto> findById(@PathVariable("id") Long id) {
+        TDto response = abstractBaseService.findById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/excel")
+    public ResponseEntity<?> importExcelData(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(
+                abstractBaseService.importExcelData(file)
+        );
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@ModelAttribute TDtoRequest creationDto) {
+        return ResponseEntity.ok(
+                abstractBaseService.saveOrUpdate(creationDto)
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponse> update(@PathVariable("id") Long id, @ModelAttribute TDtoRequest toUpdate) {
+        toUpdate.setId(id);
+        return ResponseEntity.ok(
+                abstractBaseService.saveOrUpdate(toUpdate)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(
+                abstractBaseService.deleteById(id)
+        );
     }
 }

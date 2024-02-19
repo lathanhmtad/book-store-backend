@@ -31,6 +31,7 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, loginResponse.getRefreshTokenCookie().toString())
                 .body(loginResponse);
     }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<TokenRefreshResponse> refreshToken(HttpServletRequest request) {
         TokenRefreshResponse res = authService.processRefreshToken(request);

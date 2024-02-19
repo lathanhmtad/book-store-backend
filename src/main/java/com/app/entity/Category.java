@@ -1,9 +1,8 @@
 package com.app.entity;
 
+import com.app.entity.listener.CategoryListener;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.util.Set;
 
@@ -12,9 +11,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SQLDelete(sql = "UPDATE category SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false or deleted is null")
 @Entity
+@EntityListeners(CategoryListener.class)
 public class Category extends BaseEntity {
     @Column(unique = true)
     private String name;

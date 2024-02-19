@@ -1,23 +1,25 @@
-package com.app.service.impl;
+package com.app.util;
 
-import com.app.service.CloudinaryService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
-@Service
-public class CloudinaryServiceImpl implements CloudinaryService {
+
+@Component
+public class CloudinaryUtil {
     @Value("${com.app.cloudinary.rootFolder}")
     private String rootFolder;
-    private Cloudinary cloudinary;
-    public CloudinaryServiceImpl(Cloudinary cloudinary) {
+
+    private final Cloudinary cloudinary;
+
+    public CloudinaryUtil(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
-    @Override
-    public String upload(MultipartFile file, String folder) throws Exception {
+
+    public String upload(MultipartFile file, String folder) {
         try {
             Map params = ObjectUtils.asMap(
                     "use_filename", true,
@@ -27,12 +29,11 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
             return uploadResult.get("url").toString();
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    @Override
-    public Boolean delete(String imgUrl, String folder) throws Exception {
+    public Boolean delete(String imgUrl) {
         try {
             int rootFolderIndex = imgUrl.indexOf(rootFolder);
             int lastDotIndex = imgUrl.lastIndexOf(".");
@@ -41,7 +42,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             Map result = cloudinary.uploader().destroy(publicId, options);
             return result.get("result").toString().equals("ok");
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

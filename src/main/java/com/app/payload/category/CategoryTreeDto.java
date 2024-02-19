@@ -11,6 +11,7 @@ import java.util.List;
 public class CategoryTreeDto {
     private String title;
     private Long value;
+    private Long key;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CategoryTreeDto> children = new ArrayList<>();
@@ -18,5 +19,6 @@ public class CategoryTreeDto {
     public CategoryTreeDto(String title, Long value) {
         this.title = title;
         this.value = value;
+        this.key = value;
     }
 }
